@@ -13,5 +13,5 @@ The tools will be designed first and foremost to work on a UNIX system, but I wi
 
 The following are the challenges that have been attempted, and in what languages I have completed them:
 
-* [UNIX `wc` tool](https://codingchallenges.fyi/challenges/challenge-wc/) - A simple tool to count lines, words, characters, bytes and the max line length seen within a file (or multiple files). \
-<input type="checkbox" disabled checked/>C++
+* [UNIX `wc` tool](https://codingchallenges.fyi/challenges/challenge-wc/) - A simple tool to count lines, words, characters, bytes and the max line length seen within a file (or multiple files).
+    - [x] C++
