@@ -4,6 +4,8 @@ This uses gcc/g++ and makefile to compile on UNIX systems, so ensure you have a 
 
 To compile, simply run the `make` command within this `/cpp` folder and this will create executables for all the runnable commandline tools.
 
+Compiled files can be easily cleaned by running `make clean`, which will remove all focused executables as well as any extra `*.o` files (if any remain for whatever reason).
+
 ## wc
 
 When compiled, this commandline tool can be ran using `./wc` in the `/cpp` folder, or if running from a different location make sure to call the relative path instead.
@@ -14,5 +16,7 @@ When getting started, make sure to type `./wc --help` for a more detailed explan
 * `-l` or `--lines` - prints the counts of newlines
 * `-L` or `--max-line-length` - prints the maximum display widths, also known as the maximum lengths of all the lines.
 * `-w` or `--words` - prints the counts of the words in each file.
+
+Unlike the real `wc` tool, this `./wc` tool does not handle wildcard inputs, so you would have to enter the names of all the files manually (although, as an alternative, you can run something like `./wc $(find . -type f -name "*.txt")` as a sort of pseudo-wildcard).
 
 Testing is not yet implemented, but may be in the future.
