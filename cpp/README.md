@@ -8,14 +8,16 @@ Compiled files can be easily cleaned by running `make clean`, which will remove 
 
 ## wc
 
-When compiled, this commandline tool can be ran using `./wc` in the `/cpp` folder, or if running from a different location make sure to call the relative path instead.
+This commandline tool can be ran using `python3 wc.py` in the `/python` folder, or if running from a different location make sure to call the relative path instead.
 
-When getting started, make sure to type `./wc --help` for a more detailed explanation on how the tool works, but notably you can run several flags:
+When getting started, make sure to type `python3 wc.py --help` for a more detailed explanation on how the tool works, but notably you can run several flags:
 * `-c` or `--bytes` - prints the byte counts of the files you wish to count
-* `-m` or `--chars` - prints the character counts of the files you wish to count. Because of the way that c++ reads files, this is treated the same as the `-c` flag, which is NOT characteristic of the real UNIX `wc` tool.
+* `-m` or `--chars` - prints the character counts of the files you wish to count
 * `-l` or `--lines` - prints the counts of newlines
-* `-L` or `--max-line-length` - prints the maximum display widths, also known as the maximum lengths of all the lines.
-* `-w` or `--words` - prints the counts of the words in each file.
+* `-L` or `--max-line-length` - prints the maximum display widths, also known as the maximum lengths of all the lines
+* `-w` or `--words` - prints the counts of the words in each file
+
+On pure binary files, the behavior may behave wildly different from the real `wc` tool.
 
 Unlike the real `wc` tool, this `./wc` tool does not handle wildcard inputs, so you would have to enter the names of all the files manually (although, as an alternative, you can run something like `./wc $(find . -type f -name "*.txt")` as a sort of pseudo-wildcard).
 
