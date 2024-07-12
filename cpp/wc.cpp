@@ -5,7 +5,7 @@
 #include "common.h"
 
 const char * help_str = 
-"Usage: wc [OPTION]... [FILE]...\n\n"
+"Usage: ./wc [OPTION]... [FILE]...\n\n"
 "Print newline, word, and byte counts for each FILE, and a total line if\n"
 "more than one FILE is specified. A word is a non-zero-length sequence of\n"
 "characters delimited by white space.\n\n"
@@ -17,7 +17,8 @@ const char * help_str =
 "  -l, --lines            print the newline counts\n"
 "  -L, --max-line-length  print the maximum display width\n"
 "  -w, --words            print the word counts\n"
-"      --help     display this help and exit\n";
+"      --help     display this help and exit\n\n"
+"(Thank you for using/testing this coding challenges word count tool!)";
 
 // as an aside, the print order is: -l, -w, -m, -c, -L
 
