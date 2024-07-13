@@ -6,9 +6,9 @@ To run, simply use the `python3` before the the python tool you wish to run.
 
 ## wc
 
-When compiled, this commandline tool can be ran using `./wc` in the `/cpp` folder, or if running from a different location make sure to call the relative path instead.
+This commandline tool can be ran using `python3 wc.py` in the `/python` folder, or if running from a different location make sure to call the relative path instead.
 
-When getting started, make sure to type `./wc --help` for a more detailed explanation on how the tool works, but notably you can run several flags:
+When getting started, make sure to type `python3 wc.py --help` for a more detailed explanation on how the tool works, but notably you can run several flags:
 * `-c` or `--bytes` - prints the byte counts of the files you wish to count.
 * `-m` or `--chars` - prints the character counts of the files you wish to count.
 * `-l` or `--lines` - prints the counts of newlines.
