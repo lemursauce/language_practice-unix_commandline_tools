@@ -16,8 +16,8 @@ class JSONToken(Enum):
     ARRAY_BEGIN     = 3
     ARRAY_END       = 4
     NAME            = 5    # same qualities as STRING, just in the context of a key rather than a value
-    NAME_SEPARATOR  = 6   # shouldn't really be included in final tokens unless extra_tokens=True
-    VALUE_SEPARATOR = 7
+    NAME_SEPARATOR  = 6    # shouldn't really be included in final tokens unless extra_tokens=True
+    VALUE_SEPARATOR = 7    # shouldn't really be included in final tokens unless extra_tokens=True
     STRING          = 8
     NUMBER          = 9
     BOOL            = 10
@@ -37,6 +37,8 @@ class ParseJSON:
         self.depth = 0
         self.pos : List[int] = [1,1]
         self.stack : List[Tuple[int,List[int]]] = []
+        self.error_i : int = -1
+        self.lastError : Tuple[List[int], str] | None = None
         self.file = file
         self.buildStr = ""
         if file is not None:
@@ -47,6 +49,11 @@ class ParseJSON:
     
     def printPosInfo(self) -> None:
         print(self.stack, "@", (self.i, self.pos))
+    def printError(self) -> None:
+        if self.lastError is not None:
+            print(f"Error at line {self.lastError[0][0]}, col {self.lastError[0][1]}: {self.lastError[1]}")
+        else:
+            print(f"No errors were encountered!")
     
     def pushInstance(self) -> None:
         self.stack.append((self.i, self.pos.copy()))
@@ -67,6 +74,10 @@ class ParseJSON:
     def appendToken(self, t:JSONToken, val:str) -> None:
         self.tokens.append((t,val))
         if (self.prnt): print("tokens:", self.tokens)
+    def setError(self, err:str) -> None:
+        if self.i > self.error_i:
+            self.error_i = self.i
+            self.lastError = (self.pos.copy(), err)
         
     def increment_i(self) -> None:
         if self.i < len(self.file) and self.file[self.i] == '\n':
@@ -85,7 +96,11 @@ class ParseJSON:
         if self.parseObject() or self.parseArray():
             if self.EOF():
                 self.stack.clear()
+                self.lastError = None
                 return True
+            else:
+                self.setError("Expected end of file after parsing main JSON object/array")
+        self.setError("Expected instance of object or array at beginning of file")
         self.popInstance()
         return False
     
@@ -97,6 +112,7 @@ class ParseJSON:
         
         self.depth += 1
         if MAX_DEPTH != None and self.depth > MAX_DEPTH:
+            self.setError("Exceeded maximum depth allowed")
             return False
         
         self.pushInstance()
@@ -106,12 +122,15 @@ class ParseJSON:
                     if not self.parseMember():
                         self.popInstance()
                         self.depth -= 1
+                        self.setError("Expected instance of member after value separator ','")
                         return False
                 
             if self.parseEndObject():
                 self.removeInstance()
                 self.depth -= 1
                 return True
+            else:
+                self.setError("Expected end of object '}'")
         self.popInstance()
         self.depth -= 1
         return False
@@ -132,6 +151,8 @@ class ParseJSON:
             # add token
             self.appendToken(JSONToken.NAME, self.buildStr)
             return True
+        
+        self.setError("expected member to begin with name")
         return False
     
     ''' <array>  ::= <begin_array> (<value> (<value_separator> <value>)* )? <end_array> '''
@@ -140,6 +161,7 @@ class ParseJSON:
         
         self.depth += 1
         if MAX_DEPTH != None and self.depth > MAX_DEPTH:
+            self.setError("Exceeded maximum depth allowed")
             return False
         
         self.pushInstance()
@@ -149,12 +171,15 @@ class ParseJSON:
                     if not self.parseValue():
                         self.popInstance()
                         self.depth -= 1
+                        self.setError("Expected value after value separator ','")
                         return False
             
             if self.parseEndArray():
                 self.removeInstance()
                 self.depth -= 1
                 return True
+            else:
+                self.setError("Expected end of array ']'")
         self.popInstance()
         self.depth -= 1
         return False
@@ -175,6 +200,7 @@ class ParseJSON:
             self.removeInstance()
             return True
         
+        self.setError("expected a value instance")
         self.popInstance()
         return False
     
@@ -237,10 +263,12 @@ class ParseJSON:
         while self.i < len(self.file) and self.file[self.i] != '\"':
             if not self.__parseStrChar():
                 self.popInstance()
+                self.setError("String contains an invalid character")
                 return False
         
         if not self.__parseLiteral('\"'):
             self.popInstance()
+            self.setError("Expected end of string '\"'")
             return False
         
         self.removeInstance()
@@ -278,11 +306,13 @@ class ParseJSON:
             self.buildStr += chr(int(self.file[self.i-4:self.i],16))
             return True
         
+        self.setError("String contains an invalid escape character")
         return False
     
     def __parseHex(self) -> bool:
         if self.i >= len(self.file): return False
         if self.file[self.i] not in "0123456789abcdefABCDEF":
+            self.setError("Invalid Unicode character")
             return False
         self.increment_i()
         return True
@@ -320,6 +350,22 @@ class ParseJSON:
             while self.i < len(self.file) and self.file[self.i].isdigit():
                 self.buildStr += self.file[self.i]
                 self.increment_i()
+            # extra error catching to be more human readable/understandable
+            if self.i < len(self.file) and self.file[self.i].isalnum() and self.file[self.i] not in 'eE':
+                self.popInstance()
+                self.setError("Integers cannot contain letters")
+                return False
+        # extra error catching to be more human readable/understandable   
+        elif self.i < len(self.file):
+            if self.file[self.i].isdigit():
+                self.popInstance()
+                self.setError("Integers that are not '0' cannot have a leading 0")
+                return False
+            elif self.file[self.i].isalpha() and self.file[self.i] not in 'eE':
+                self.popInstance()
+                self.setError("Integers cannot contain letters")
+                return False
+        
         
         self.removeInstance()
         return True
@@ -400,6 +446,7 @@ class ParseJSON:
             # add token
             if extra_tokens: self.appendToken(JSONToken.NAME_SEPARATOR, ':')
             return True
+        self.setError("Expected name separator ':'")
         return False
     def parseValueSeparator(self) -> bool:
         if self.__parseSeparator(','):
@@ -428,7 +475,10 @@ class ParseJSON:
         return False
     
     def EOF(self) -> bool:
-        return self.i >= len(self.file)
+        if self.i >= len(self.file):
+            return True
+        self.setError("Expected to have reached the end of the file. There must be extra content in the file that is not allowed.")
+        return False
     
 
 ##### main calls #####
@@ -441,7 +491,7 @@ def parse_args() -> argparse.Namespace:
         description="A toy JSON parser/validator",
         epilog="")
     arg_parser.add_argument("filenames", nargs='*', default=None, help="Input files")
-    arg_parser.add_argument("-e", "--error", action="store_true", help="print error/exception info")
+    arg_parser.add_argument("-t", "--tokens", action="store_true", help="print tokens generated from parsing/validation")
     arg_parser.add_argument("-p", "--print", action="store_true", help="print all info (including final tokens when valid)")
     return arg_parser.parse_args()
 
@@ -461,9 +511,10 @@ if __name__ == "__main__":
                             print("\t",token)
                 else:
                     print(fileName, ": NOT VALID", sep = '')
-                    if args.error:
-                        for token in p.tokens:
-                            print("\t",token)
+                    p.printError()
+                if args.tokens:
+                    for token in p.tokens:
+                        print("\t",token)
                     
         except Exception as ex:
             print(ex)
