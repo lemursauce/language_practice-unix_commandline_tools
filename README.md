@@ -17,3 +17,6 @@ The following are the challenges that have been attempted, and in what languages
     - [x] C++
     - [x] Python
     - [x] Java
+
+* [UNIX `JSON Parsing/Validation` tool](https://codingchallenges.fyi/challenges/challenge-json-parser) - A tool meant as an exercise in building a language parser. This tool should be able to parse/validate a `.json` file (or multiple files).
+    - [x] Python
