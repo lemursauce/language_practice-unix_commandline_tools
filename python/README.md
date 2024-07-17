@@ -20,3 +20,15 @@ On pure binary files, the behavior may behave wildly different from the real `wc
 Because of the nature of `argparse`, this tool can handle wildcard inputs!
 
 Testing is not yet implemented, but may be in the future.
+
+## JSON Validator
+
+This commandline tool can be ran using `python3 validateJSON.py` in the `/python` folder, or if running from a different location make sure to call the relative path instead.
+
+When getting started, make sure to type `python3 validateJSON.py --help` for a more detailed explanation on how the tool works, but notably you can run with a few flags:
+* `-p` or `--print` - prints all trace information / the informaton that occurs in the background when this tool is ran.
+* `-t` or `--tokens` - prints the tokens that are generated during the process, whether successful or not.
+
+Because of the nature of `argparse`, this tool can handle wildcard inputs. Additionally, this can be ran on non-json files, but it is expected to be ran on files to test if they follow the json format, so binary files are out of the question.
+
+Automatic testing is not yet implemented, but this has been tested on the files provided in [step 5](https://codingchallenges.fyi/challenges/challenge-json-parser#step-5).
