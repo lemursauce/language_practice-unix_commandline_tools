@@ -426,19 +426,19 @@ class ParseJSON:
     def parseBeginArray(self) -> bool:
         if self.__parseSeparator('['):
             # add token
-            self.appendToken(JSONToken.OBJECT_BEGIN, '[')
+            self.appendToken(JSONToken.ARRAY_BEGIN, '[')
             return True
         return False
     def parseEndObject(self) -> bool:
         if self.__parseSeparator('}'):
             # add token
-            self.appendToken(JSONToken.OBJECT_BEGIN, '}')
+            self.appendToken(JSONToken.OBJECT_END, '}')
             return True
         return False
     def parseEndArray(self) -> bool:
         if self.__parseSeparator(']'):
             # add token
-            self.appendToken(JSONToken.OBJECT_BEGIN, ']')
+            self.appendToken(JSONToken.ARRAY_END, ']')
             return True
         return False
     def parseNameSeparator(self) -> bool:
